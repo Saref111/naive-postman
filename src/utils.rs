@@ -18,8 +18,7 @@ pub fn send_req(url: &str, method: Method, body: &str, client: &Client) -> Strin
 pub fn parse_resp(resp: Response) -> String {
     let status = resp.status();
     let headers = resp.headers().clone();
-    let http_version = resp.version();
-    let http_version = match http_version {
+    let http_version = match resp.version() {
         Version::HTTP_09 => "HTTP/0.9",
         Version::HTTP_10 => "HTTP/1.0",
         Version::HTTP_11 => "HTTP/1.1",
