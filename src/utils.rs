@@ -1,4 +1,7 @@
-use reqwest::{blocking::Client, blocking::Response, Method};
+use reqwest::{
+    blocking::{Client, Response},
+    Method, Version,
+};
 
 pub fn send_req(url: &str, method: Method, body: &str, client: &Client) -> String {
     let request = match method {
@@ -15,10 +18,20 @@ pub fn send_req(url: &str, method: Method, body: &str, client: &Client) -> Strin
 pub fn parse_resp(resp: Response) -> String {
     let status = resp.status();
     let headers = resp.headers().clone();
+    let http_version = resp.version();
+    let http_version = match http_version {
+        Version::HTTP_09 => "HTTP/0.9",
+        Version::HTTP_10 => "HTTP/1.0",
+        Version::HTTP_11 => "HTTP/1.1",
+        Version::HTTP_2 => "HTTP/2.0",
+        Version::HTTP_3 => "HTTP/3.0",
+        _ => "Unknown version",
+    };
     match resp.text() {
         Ok(body) => {
             let mut result = format!(
-                "HTTP/1.1 {} {}\n",
+                "{} {} {}\n",
+                http_version,
                 status.as_u16(),
                 status.canonical_reason().unwrap_or("Unknown")
             );
