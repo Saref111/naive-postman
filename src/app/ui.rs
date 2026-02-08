@@ -29,12 +29,19 @@ pub fn render_body_textarea(ui: &mut Ui, app: &mut App) {
 pub fn render_response_field(ui: &mut Ui, result: &String) {
     ui.separator();
     ui.label("Response:");
-    let mut result_text = result.clone();
-    ui.add(
-        egui::TextEdit::multiline(&mut result_text)
-            .interactive(false)
-            .desired_rows(10),
-    );
+
+    let (head, body) = result.split_once("\n\n").unwrap_or((result, ""));
+
+    egui::ScrollArea::vertical()
+        .auto_shrink([false; 2])
+        .max_height(350.0)
+        .show(ui, |ui| {
+            ui.add(egui::Label::new(egui::RichText::new(head).monospace()).selectable(true));
+            if !body.is_empty() {
+                ui.separator();
+                ui.add(egui::Label::new(body).selectable(true));
+            }
+        });
 }
 
 pub fn handle_send_button(app: &mut App) {
