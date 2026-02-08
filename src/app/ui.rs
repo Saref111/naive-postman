@@ -50,10 +50,11 @@ pub fn handle_send_button(app: &mut App) {
         let url = app.url.clone();
         let method = app.method.clone();
         let body = app.body.clone();
+        let client = app.client.clone();
         let (tx, rx) = mpsc::channel();
         app.result_receiver = Some(rx);
         thread::spawn(move || {
-            let result = send_req(&url, method, &body);
+            let result = send_req(&url, method, &body, &client);
             tx.send(result).unwrap();
         });
     } else {

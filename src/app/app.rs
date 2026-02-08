@@ -1,5 +1,5 @@
 use eframe::egui;
-use reqwest::Method;
+use reqwest::{blocking::Client, Method};
 use std::sync::mpsc;
 
 use crate::app::ui::{
@@ -15,6 +15,7 @@ pub struct App {
     pub result: Option<String>,
     pub is_loading: bool,
     pub result_receiver: Option<mpsc::Receiver<String>>,
+    pub client: Client,
 }
 
 impl Default for App {
@@ -26,6 +27,7 @@ impl Default for App {
             result: None,
             is_loading: false,
             result_receiver: None,
+            client: reqwest::blocking::Client::new(),
         }
     }
 }

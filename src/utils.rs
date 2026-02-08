@@ -1,7 +1,6 @@
-use reqwest::{blocking::Response, Method};
+use reqwest::{blocking::Client, blocking::Response, Method};
 
-pub fn send_req(url: &str, method: Method, body: &str) -> String {
-    let client = reqwest::blocking::Client::new();
+pub fn send_req(url: &str, method: Method, body: &str, client: &Client) -> String {
     let request = match method {
         Method::GET => client.get(url),
         Method::POST => client.post(url).body(body.to_string()),
