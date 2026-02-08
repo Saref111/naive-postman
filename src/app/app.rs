@@ -2,9 +2,9 @@ use eframe::egui;
 use reqwest::Method;
 use std::sync::mpsc;
 
-use crate::{
-    app::ui::{handle_send_button, render_body_textarea, render_method_radio, render_url_field},
-    utils::send_req,
+use crate::app::ui::{
+    handle_send_button, render_body_textarea, render_method_radio, render_response_field,
+    render_url_field,
 };
 
 #[derive(Debug)]
@@ -32,7 +32,6 @@ impl Default for App {
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &eframe::egui::Context, _frame: &mut eframe::Frame) {
-        // Check if we have a result from the background thread
         if let Some(ref receiver) = self.result_receiver {
             if let Ok(result) = receiver.try_recv() {
                 self.result = Some(result);
@@ -60,14 +59,7 @@ impl eframe::App for App {
             }
 
             if let Some(result) = &self.result {
-                ui.separator();
-                ui.label("Response:");
-                let mut result_text = result.clone();
-                ui.add(
-                    egui::TextEdit::multiline(&mut result_text)
-                        .interactive(false)
-                        .desired_rows(10),
-                );
+                render_response_field(ui, result);
             }
         });
     }

@@ -1,4 +1,4 @@
-use eframe::egui::Ui;
+use eframe::egui::{self, Ui};
 use reqwest::Method;
 use std::sync::mpsc;
 use std::thread;
@@ -24,6 +24,17 @@ pub fn render_method_radio(ui: &mut Ui, app: &mut App) {
 pub fn render_body_textarea(ui: &mut Ui, app: &mut App) {
     let label = ui.label("Body: ");
     ui.text_edit_multiline(&mut app.body).labelled_by(label.id);
+}
+
+pub fn render_response_field(ui: &mut Ui, result: &String) {
+    ui.separator();
+    ui.label("Response:");
+    let mut result_text = result.clone();
+    ui.add(
+        egui::TextEdit::multiline(&mut result_text)
+            .interactive(false)
+            .desired_rows(10),
+    );
 }
 
 pub fn handle_send_button(app: &mut App) {
