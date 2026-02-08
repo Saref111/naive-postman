@@ -40,6 +40,10 @@ impl eframe::App for App {
             }
         }
 
+        if self.is_loading {
+            ctx.request_repaint();
+        }
+
         egui::CentralPanel::default().show(ctx, |ui| {
             render_url_field(ui, self);
 
