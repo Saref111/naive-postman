@@ -1,12 +1,10 @@
 use reqwest::{blocking::Response, Method};
 
-use crate::app::MyApp;
-
-pub fn send_req(app: &MyApp) -> String {
+pub fn send_req(url: &str, method: Method, body: &str) -> String {
     let client = reqwest::blocking::Client::new();
-    let request = match app.method {
-        Method::GET => client.get(&app.url),
-        Method::POST => client.post(&app.url).body(app.body.clone()),
+    let request = match method {
+        Method::GET => client.get(url),
+        Method::POST => client.post(url).body(body.to_string()),
         _ => return "Unsupported method".to_string(),
     };
     match request.send() {
