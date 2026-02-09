@@ -2,9 +2,12 @@ use eframe::egui;
 use reqwest::{blocking::Client, Method};
 use std::{collections::HashMap, sync::mpsc};
 
-use crate::app::ui::{
-    handle_send_button, render_body_textarea, render_method_radio, render_response_field,
-    render_url_field,
+use crate::app::{
+    headers::Headers,
+    ui::{
+        handle_send_button, render_body_textarea, render_method_radio, render_response_field,
+        render_url_field,
+    },
 };
 
 #[derive(Debug)]
@@ -16,7 +19,7 @@ pub struct App {
     pub is_loading: bool,
     pub result_receiver: Option<mpsc::Receiver<String>>,
     pub client: Client,
-    pub headers: Vec<(String, String)>,
+    pub headers: Headers,
 }
 
 impl Default for App {
@@ -29,7 +32,7 @@ impl Default for App {
             is_loading: false,
             result_receiver: None,
             client: reqwest::blocking::Client::new(),
-            headers: vec![],
+            headers: Headers::new(),
         }
     }
 }
@@ -53,9 +56,8 @@ impl eframe::App for App {
 
             render_method_radio(ui, self);
 
-            // let headers = self.headers.clone();
             let mut to_remove = vec![];
-            for (i, (k, v)) in self.headers.iter_mut().enumerate() {
+            for (i, (k, v)) in self.headers.data.iter_mut().enumerate() {
                 ui.horizontal(|ui| {
                     ui.text_edit_singleline(k);
                     ui.text_edit_singleline(v);
@@ -65,18 +67,18 @@ impl eframe::App for App {
                 });
             }
             for i in to_remove.iter().rev() {
-                self.headers.remove(*i);
+                self.headers.data.remove(*i);
             }
 
-            let mut new_key = String::new();
-            let mut new_value = String::new();
             ui.horizontal(|ui| {
-                ui.text_edit_singleline(&mut new_key);
-                ui.text_edit_singleline(&mut new_value);
-                if ui.button("Add Header").clicked() && !new_key.is_empty() {
-                    self.headers.push((new_key.clone(), new_value.clone()));
-                    new_key.clear();
-                    new_value.clear();
+                ui.text_edit_singleline(&mut self.headers.new_key);
+                ui.text_edit_singleline(&mut self.headers.new_value);
+                if ui.button("Add Header").clicked() && !self.headers.new_key.is_empty() {
+                    self.headers
+                        .data
+                        .push((self.headers.new_key.clone(), self.headers.new_value.clone()));
+                    self.headers.new_key.clear();
+                    self.headers.new_value.clear();
                 }
             });
 
