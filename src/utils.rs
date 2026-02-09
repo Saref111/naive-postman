@@ -26,6 +26,7 @@ pub fn parse_resp(resp: Response) -> String {
         Version::HTTP_3 => "HTTP/3.0",
         _ => "Unknown version",
     };
+
     match resp.text() {
         Ok(body) => {
             let mut result = format!(
