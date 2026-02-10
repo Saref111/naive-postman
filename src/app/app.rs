@@ -25,7 +25,7 @@ pub struct App {
 impl Default for App {
     fn default() -> Self {
         Self {
-            url: "https:/google.com".into(), //temp
+            url: "https://echo.free.beeceptor.com".into(), //temp
             method: Method::GET,
             body: String::new(),
             result: None,

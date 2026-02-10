@@ -1,12 +1,15 @@
-use reqwest::{
-    blocking::{Client, Response},
-    Method, Version,
-};
+use reqwest::{blocking::Response, Method, Version};
 
-pub fn send_req(url: &str, method: Method, body: &str, client: &Client) -> String {
-    let request = match method {
-        Method::GET => client.get(url),
-        Method::POST => client.post(url).body(body.to_string()),
+use crate::app::RequestData;
+
+pub fn send_req(app: RequestData) -> String {
+    let request = match app.method {
+        Method::GET => app.client.get(&app.url),
+        Method::POST => app
+            .client
+            .post(&app.url)
+            .headers(app.headers.get_map())
+            .body(app.body.to_string()),
         _ => return "Unsupported method".to_string(),
     };
     match request.send() {

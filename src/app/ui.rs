@@ -3,8 +3,8 @@ use reqwest::Method;
 use std::sync::mpsc;
 use std::thread;
 
-use crate::app::headers::Headers;
-use crate::app::App;
+use crate::app::headers::{self, Headers};
+use crate::app::{App, RequestData};
 use crate::utils::send_req;
 
 pub fn render_url_field(ui: &mut Ui, app: &mut App) {
@@ -80,10 +80,18 @@ pub fn handle_send_button(app: &mut App) {
         let method = app.method.clone();
         let body = app.body.clone();
         let client = app.client.clone();
+        let headers = app.headers.clone();
         let (tx, rx) = mpsc::channel();
         app.result_receiver = Some(rx);
         thread::spawn(move || {
-            let result = send_req(&url, method, &body, &client);
+            let rd = RequestData {
+                url,
+                method,
+                body,
+                client,
+                headers,
+            };
+            let result = send_req(rd);
             tx.send(result).unwrap();
         });
     } else {
