@@ -1,12 +1,12 @@
 use eframe::egui;
 use reqwest::{blocking::Client, Method};
-use std::{collections::HashMap, sync::mpsc};
+use std::sync::mpsc;
 
 use crate::app::{
     headers::Headers,
     ui::{
-        handle_send_button, render_body_textarea, render_method_radio, render_response_field,
-        render_url_field,
+        handle_send_button, render_body_textarea, render_headers, render_method_radio,
+        render_response_field, render_url_field,
     },
 };
 
@@ -56,33 +56,8 @@ impl eframe::App for App {
 
             render_method_radio(ui, self);
 
-            let mut to_remove = vec![];
-            for (i, (k, v)) in self.headers.data.iter_mut().enumerate() {
-                ui.horizontal(|ui| {
-                    ui.text_edit_singleline(k);
-                    ui.text_edit_singleline(v);
-                    if ui.button("Remove").clicked() {
-                        to_remove.push(i);
-                    }
-                });
-            }
-            for i in to_remove.iter().rev() {
-                self.headers.data.remove(*i);
-            }
-
-            ui.horizontal(|ui| {
-                ui.text_edit_singleline(&mut self.headers.new_key);
-                ui.text_edit_singleline(&mut self.headers.new_value);
-                if ui.button("Add Header").clicked() && !self.headers.new_key.is_empty() {
-                    self.headers
-                        .data
-                        .push((self.headers.new_key.clone(), self.headers.new_value.clone()));
-                    self.headers.new_key.clear();
-                    self.headers.new_value.clear();
-                }
-            });
-
             if self.method == Method::POST {
+                render_headers(ui, &mut self.headers);
                 render_body_textarea(ui, self);
             }
 

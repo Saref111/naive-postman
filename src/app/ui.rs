@@ -3,6 +3,7 @@ use reqwest::Method;
 use std::sync::mpsc;
 use std::thread;
 
+use crate::app::headers::Headers;
 use crate::app::App;
 use crate::utils::send_req;
 
@@ -42,6 +43,34 @@ pub fn render_response_field(ui: &mut Ui, result: &String) {
                 ui.add(egui::Label::new(body).selectable(true));
             }
         });
+}
+
+pub fn render_headers(ui: &mut Ui, headers: &mut Headers) {
+    let mut to_remove = vec![];
+    for (i, (k, v)) in headers.data.iter_mut().enumerate() {
+        ui.horizontal(|ui| {
+            ui.text_edit_singleline(k);
+            ui.text_edit_singleline(v);
+            if ui.button("Remove").clicked() {
+                to_remove.push(i);
+            }
+        });
+    }
+    for i in to_remove.iter().rev() {
+        headers.data.remove(*i);
+    }
+
+    ui.horizontal(|ui| {
+        ui.text_edit_singleline(&mut headers.new_key);
+        ui.text_edit_singleline(&mut headers.new_value);
+        if ui.button("Add Header").clicked() && !headers.new_key.is_empty() {
+            headers
+                .data
+                .push((headers.new_key.clone(), headers.new_value.clone()));
+            headers.new_key.clear();
+            headers.new_value.clear();
+        }
+    });
 }
 
 pub fn handle_send_button(app: &mut App) {
